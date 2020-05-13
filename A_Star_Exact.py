@@ -22,6 +22,14 @@ edge_del = int(args.edge_del_ins)
 root_path = r'./GED_data/preprocessed_C/alkane'
 void = None
 
+# 差异集计算
+def inplace_differ_dict(dict1 : dict, dict2: dict):
+    for key in dict2:
+        if key in dict1:
+            dict1[key] -= dict2[key]
+        else:
+            dict1[key] = -dict2[key]
+
 class Graph:
     def __init__(self, path: str):
         with open(root_path + '/' + path, 'r') as fp:
@@ -31,13 +39,14 @@ class Graph:
             self.dots, self.edges = tuple(map(int, line[0]))
             self.dtag = [0 for _ in range(self.dots)]
             self.etag = {}
+            self.etagset = set()
 
             for dot in range(self.dots):
                 self.dtag[int(line[dot + 1][0]) - 1] = line[dot + 1][1]
             for i in range(1 + self.dots, 1 + self.dots + self.edges):
                 self.etag[(int(line[i][0]) - 1, int(line[i][1]) - 1)] = line[i][2]
                 self.etag[(int(line[i][1]) - 1, int(line[i][0]) - 1)] = line[i][2]
-
+                self.etagset.add(line[i][2])
 
 class Partial:
     def __init__(self, graph1: Graph, graph2: Graph, cost: int, old_part_map=(), expand=void):
@@ -90,7 +99,67 @@ class Partial:
         return result
 
     def Heuristic(self) -> int:
-        return 0
+        result = 0
+        # 余下的点编辑代价的下界
+        dot = len(self.part_map)
+        # 是否需要启发
+        if dot == self.graph1.dots:
+            return 0
+        dict1 = {tag:0 for tag in self.graph1.dtag[dot:]}
+        for tag in self.graph1.dtag[dot:]:
+            dict1[tag] += 1
+
+        dotset = set(range(self.graph2.dots)) - set(self.part_map)
+        dict2 = {self.graph2.dtag[num]:0 for num in dotset}
+        for num in dotset:
+            dict2[self.graph2.dtag[num]] += 1
+        inplace_differ_dict(dict1, dict2)
+        # 获取标签分布的差异集大小
+        dots1 = 0
+        dots2 = 0
+        for val in dict1.values():
+            if val > 0:
+                dots1 += val
+            else:
+                dots2 -= val
+        # 删除/插入 or 替换
+        if dot_sub >= dot_del + dot_ins:
+            result += (dots1 * dot_del + dots2 * dot_ins)
+        elif dots1 > dots2:
+            result += (dots2 * dot_sub + (dots1 - dots2) * dot_del)
+        else:
+            result += (dots1 * dot_sub + (dots2 - dots1) * dot_ins)
+
+        # 余下的边替换编辑代价的下界
+        dict1 = {tag: 0 for tag in self.graph1.etagset}
+        dict2 = {tag: 0 for tag in self.graph2.etagset}
+        for (st, ed), tag in self.graph1.etag.items():
+            if st > ed: # 去掉平行边
+                continue
+            if st >= dot or ed >= dot:
+                dict1[tag] += 1
+        for (st, ed), tag in self.graph2.etag.items():
+            if st > ed: # 去掉平行边
+                continue
+            if st in dotset or ed in dotset:
+                dict2[tag] += 1
+        inplace_differ_dict(dict1, dict2)
+        # 获取标签分布的差异集大小
+        edges1 = 0
+        edges2 = 0
+        for val in dict1.values():
+            if val > 0:
+                edges1 += val
+            else:
+                edges2 -= val
+        # 删除/插入 or 替换
+        if edge_sub >= edge_del + edge_ins:
+            result += (edges1 * edge_del + edges2 * edge_ins)
+        elif edges1 > edges2:
+            result += (edges2 * edge_sub + (edges1 - edges2) * edge_del)
+        else:
+            result += (edges1 * edge_sub + (edges2 - edges1) * edge_ins)
+        return result
 
 
 graph1 = Graph(args.graph1)
