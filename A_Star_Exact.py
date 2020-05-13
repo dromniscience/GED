@@ -4,12 +4,12 @@ from queue import PriorityQueue
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("dot_sub")
-parser.add_argument("dot_del_ins")
-parser.add_argument("edge_sub")
-parser.add_argument("edge_del_ins")
-parser.add_argument("graph1")
-parser.add_argument("graph2")
+parser.add_argument("dot_sub",help="Substitution cost of a dot")
+parser.add_argument("dot_del_ins",help="Deletion/Insertion cost of a dot")
+parser.add_argument("edge_sub",help="Substitution cost of an edge")
+parser.add_argument("edge_del_ins",help="Deletion/Insertion cost of an edge")
+parser.add_argument("graph1",help="Use an graph in Alkane as g_1")
+parser.add_argument("graph2",help="Use an graph in Alkane as g_2")
 args = parser.parse_args()
 
 dot_sub = int(args.dot_sub)
