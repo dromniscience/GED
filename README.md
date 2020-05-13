@@ -16,4 +16,6 @@ GED Graphic Edit Distance - 2020算分课程团队项目
 示例： \>\> python A_Star_Exact.py 2 4 1 1 molecule100.txt molecule050.txt  
 
 ## Bipartite Graph Matching
-    基于论文 Approximate graph edit distance computation by means of bipartite graph matching(2008) Kaspar Riesen et al.
+    基于论文 Approximate graph edit distance computation by means of bipartite graph matching(2008) Kaspar Riesen et al, 实现在 Bipartite_Graph_Matching.py 中。
+交互：  命令行输入， \>\> python Bipartite_Graph_Matching.py -h 查看交互说明  
+示例： \>\> python Bipartite_Graph_Matching.py -m 2 4 1 1 molecule_100.txt molecule_1000.txt
