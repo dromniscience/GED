@@ -1,5 +1,12 @@
 # -*- coding:utf-8 -*-
 
+"""BP_Match.py: Bipartite Graph Matching with 1-star local structure
+    Written by Ding Rui
+
+Last Version: 2020/5/14
+
+"""
+
 from scipy.optimize import linear_sum_assignment
 import numpy as np
 
@@ -17,7 +24,7 @@ args = parser.parse_args()
 dot_sub = args.dot_sub
 dot_ins = args.dot_del_ins
 dot_del = args.dot_del_ins
-edge_sub = args.edge_sub
+edge_sub = min(args.edge_sub, 2 * args.edge_del_ins) # 边替换尝试用边删除+边插入替代
 edge_ins = args.edge_del_ins
 edge_del = args.edge_del_ins
 
@@ -48,10 +55,7 @@ class Graph:
 # 差异集计算
 def inplace_differ_dict(dict1 : dict, dict2: dict):
     for key in dict2:
-        if key in dict1:
-            dict1[key] -= dict2[key]
-        else:
-            dict1[key] = -dict2[key]
+        dict1[key] = dict1.get(key, 0) - dict2[key]
 
 def additional_edge_cost(graph1: Graph, graph2: Graph, dot1: int, dot2: int) -> int:
     if dot1 == void and dot2 == void: # void -> void
@@ -76,9 +80,8 @@ def additional_edge_cost(graph1: Graph, graph2: Graph, dot1: int, dot2: int) -> 
                 edge1 += val
             else:
                 edge2 -= val
-        if edge_sub >= edge_del + edge_ins:
-            return edge1 * edge_del + edge2 * edge_ins
-        elif edge1 > edge2:
+        # 边替换总不劣于边删除+边插入
+        if edge1 > edge2:
             return edge2 * edge_sub + (edge1 - edge2) * edge_del
         else:
             return edge1 * edge_sub + (edge2 - edge1) * edge_ins
@@ -103,6 +106,7 @@ def compute_GED(graph1: Graph, graph2: Graph, map: tuple) -> int:
             dot1_map = map[dot1]
             dot2_map = map[dot2]
             if (dot2_map, dot1_map) in graph2.etag:
+                # 肯定做边替换，而非边删除+边插入
                 result += (edge_sub if graph2.etag[(dot2_map, dot1_map)] != tag else 0)
             else:
                 result += edge_del
