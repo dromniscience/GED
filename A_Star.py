@@ -1,34 +1,40 @@
 # -*- coding:utf-8 -*- 
 
+"""A_Star.py: A*-algorithm for GED
+    Written by Ding Rui
+
+Last Version: 2020/5/14
+
+"""
+
 from queue import PriorityQueue
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("dot_sub",help="Substitution cost of a dot")
-parser.add_argument("dot_del_ins",help="Deletion/Insertion cost of a dot")
-parser.add_argument("edge_sub",help="Substitution cost of an edge")
-parser.add_argument("edge_del_ins",help="Deletion/Insertion cost of an edge")
+parser.add_argument("dot_sub",help="Substitution cost of a dot",type=int)
+parser.add_argument("dot_del_ins",help="Deletion/Insertion cost of a dot",type=int)
+parser.add_argument("edge_sub",help="Substitution cost of an edge",type=int)
+parser.add_argument("edge_del_ins",help="Deletion/Insertion cost of an edge",type=int)
 parser.add_argument("graph1",help="Use a graph in Alkane as g_1")
 parser.add_argument("graph2",help="Use a graph in Alkane as g_2")
 args = parser.parse_args()
 
-dot_sub = int(args.dot_sub)
-dot_ins = int(args.dot_del_ins)
-dot_del = int(args.dot_del_ins)
-edge_sub = int(args.edge_sub)
-edge_ins = int(args.edge_del_ins)
-edge_del = int(args.edge_del_ins)
+dot_sub = args.dot_sub
+dot_ins = args.dot_del_ins
+dot_del = args.dot_del_ins
+edge_sub = min(args.edge_sub, 2 * args.edge_del_ins) # 边替换尝试用边删除+边插入替代
+edge_ins = args.edge_del_ins
+edge_del = args.edge_del_ins
 
 root_path = r'./GED_data/preprocessed_C/alkane'
 void = None
 
+
 # 差异集计算
 def inplace_differ_dict(dict1 : dict, dict2: dict):
     for key in dict2:
-        if key in dict1:
-            dict1[key] -= dict2[key]
-        else:
-            dict1[key] = -dict2[key]
+        dict1[key] = dict1.get(key, 0) - dict2[key]
+
 
 class Graph:
     def __init__(self, path: str):
@@ -79,6 +85,7 @@ class Partial:
                 dot_map = self.part_map[dot]  # dot1 -> dot2; dot -> dot_map;
                 if (dot1, dot) in self.graph1.etag:
                     if (dot2, dot_map) in self.graph2.etag:
+                        # 肯定做的是边替换(而不是边删除+边插入)
                         result += (edge_sub if self.graph2.etag[(dot2, dot_map)] != self.graph1.etag[(dot1, dot)] else 0)
                     else:
                         result += edge_del
@@ -87,9 +94,11 @@ class Partial:
 
         # 当前是否能确定graph2剩余点的映射
         if dot1 == self.graph1.dots - 1:
+            # 点代价
             already = set(self.part_map) - {void}
             left = set(range(self.graph2.dots)) - already
             result += len(left) * dot_ins
+            # 边代价
             for i in left:
                 for j in already:
                     if (i,j) in self.graph2.etag:
@@ -152,10 +161,8 @@ class Partial:
                 edges1 += val
             else:
                 edges2 -= val
-        # 删除/插入 or 替换
-        if edge_sub >= edge_del + edge_ins:
-            result += (edges1 * edge_del + edges2 * edge_ins)
-        elif edges1 > edges2:
+        # 边替换总不劣于边删除+边插入
+        if edges1 > edges2:
             result += (edges2 * edge_sub + (edges1 - edges2) * edge_del)
         else:
             result += (edges1 * edge_sub + (edges2 - edges1) * edge_ins)
@@ -175,7 +182,7 @@ while True:
     if len(partial.part_map) == graph1.dots:
         print("GED =", partial.tot_cost)
         for i in range(graph1.dots):
-            print(i + 1, "->", partial.part_map[i] + 1 if isinstance(partial.part_map[i], int) else None)
+            print(i + 1, "->", (partial.part_map[i] + 1) if isinstance(partial.part_map[i], int) else None)
         break
     else:
         left = set(range(graph2.dots)) - set(partial.part_map)
