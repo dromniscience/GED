@@ -23,4 +23,4 @@ GED Graphic Edit Distance - 2020算分课程团队项目
 示例： \>\> python BP_Match.py -m 2 4 1 1 molecule_100.txt molecule_1000.txt
 
 ### QAP
-&emsp;使用BP_Match(cost, g<sub>1</sub>, g<sub>2</sub>)初始化的 IPFP 方法。 
+&emsp;使用 BP_Match(cost, g<sub>1</sub>, g<sub>2</sub>) 初始化的 IPFP 方法。 
