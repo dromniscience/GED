@@ -16,7 +16,11 @@ GED Graphic Edit Distance - 2020算分课程团队项目
 示例： \>\> python A_Star.py 2 4 1 1 molecule100.txt molecule050.txt  
 
 ## Bipartite Graph Matching
+### LSAP + 1-star local structure
     基于论文 Approximate graph edit distance computation by means of bipartite graph matching(2008) Kaspar Riesen et al.
     实现在 BP_Match.py 中。
 交互：  命令行输入， \>\> python BP_Match.py -h 查看交互说明  
 示例： \>\> python BP_Match.py -m 2 4 1 1 molecule_100.txt molecule_1000.txt
+
+### QAP
+&emsp;使用BP_Match(cost, g<sub>1</sub>, g<sub>2</sub>)初始化的 IPFP 方法。 
