@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 """
-BGM.py: Bipartite Graph Matching with 1-star local structure
+BGM1.py: Bipartite Graph Matching with 1-star local structure
 
 Written by Ding Rui
 Latest Version: 2020/5/24
