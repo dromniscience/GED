@@ -1,59 +1,19 @@
 # -*- coding:utf-8 -*- 
 
-"""A_Star.py: A*-algorithm for GED
-    Written by Ding Rui
+"""
+AStar.py: A*-algorithm for GED
 
-Last Version: 2020/5/14
-
+Written by Ding Rui
+Last Version: 2020/5/24
 """
 
 from queue import PriorityQueue
+from common import ArgParse, Graph, PrintGED, InplaceDifferDict
 
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("dot_sub",help="Substitution cost of a dot",type=int)
-parser.add_argument("dot_del_ins",help="Deletion/Insertion cost of a dot",type=int)
-parser.add_argument("edge_sub",help="Substitution cost of an edge",type=int)
-parser.add_argument("edge_del_ins",help="Deletion/Insertion cost of an edge",type=int)
-parser.add_argument("graph1",help="Use a graph in Alkane as g_1")
-parser.add_argument("graph2",help="Use a graph in Alkane as g_2")
-args = parser.parse_args()
+dot_sub, dot_ins, dot_del, edge_sub, edge_ins, edge_del, root_path, void, inf,\
+    graph1, graph2 = ArgParse()
 
-dot_sub = args.dot_sub
-dot_ins = args.dot_del_ins
-dot_del = args.dot_del_ins
-edge_sub = min(args.edge_sub, 2 * args.edge_del_ins) # 边替换尝试用边删除+边插入替代
-edge_ins = args.edge_del_ins
-edge_del = args.edge_del_ins
-
-root_path = r'./GED_data/preprocessed_C/alkane'
-void = None
-
-
-# 差异集计算
-def inplace_differ_dict(dict1 : dict, dict2: dict):
-    for key in dict2:
-        dict1[key] = dict1.get(key, 0) - dict2[key]
-
-
-class Graph:
-    def __init__(self, path: str):
-        with open(root_path + '/' + path, 'r') as fp:
-            line = fp.readlines()
-            for i in range(len(line)):
-                line[i] = line[i].split()
-            self.dots, self.edges = tuple(map(int, line[0]))
-            self.dtag = [0 for _ in range(self.dots)]
-            self.etag = {}
-            self.etagset = set()
-
-            for dot in range(self.dots):
-                self.dtag[int(line[dot + 1][0]) - 1] = line[dot + 1][1]
-            for i in range(1 + self.dots, 1 + self.dots + self.edges):
-                self.etag[(int(line[i][0]) - 1, int(line[i][1]) - 1)] = line[i][2]
-                self.etag[(int(line[i][1]) - 1, int(line[i][0]) - 1)] = line[i][2]
-                self.etagset.add(line[i][2])
-
+# 局部路径
 class Partial:
     def __init__(self, graph1: Graph, graph2: Graph, cost: int, old_part_map=(), expand=void):
         self.graph1, self.graph2 = graph1, graph2
@@ -122,7 +82,7 @@ class Partial:
         dict2 = {self.graph2.dtag[num]:0 for num in dotset}
         for num in dotset:
             dict2[self.graph2.dtag[num]] += 1
-        inplace_differ_dict(dict1, dict2)
+        InplaceDifferDict(dict1, dict2)
         # 获取标签分布的差异集大小
         dots1 = 0
         dots2 = 0
@@ -152,7 +112,7 @@ class Partial:
                 continue
             if st in dotset or ed in dotset:
                 dict2[tag] += 1
-        inplace_differ_dict(dict1, dict2)
+        InplaceDifferDict(dict1, dict2)
         # 获取标签分布的差异集大小
         edges1 = 0
         edges2 = 0
@@ -169,8 +129,8 @@ class Partial:
         return result
 
 
-graph1 = Graph(args.graph1)
-graph2 = Graph(args.graph2)
+graph1 = Graph(root_path + '/'+ graph1)
+graph2 = Graph(root_path + '/'+ graph2)
 
 queue = PriorityQueue()
 for i in range(graph2.dots):
@@ -180,9 +140,7 @@ queue.put(Partial(graph1, graph2, 0, tuple(), void))
 while True:
     partial = queue.get()
     if len(partial.part_map) == graph1.dots:
-        print("GED =", partial.tot_cost)
-        for i in range(graph1.dots):
-            print(i + 1, "->", (partial.part_map[i] + 1) if isinstance(partial.part_map[i], int) else None)
+        PrintGED(graph1, graph2, partial.part_map)
         break
     else:
         left = set(range(graph2.dots)) - set(partial.part_map)
