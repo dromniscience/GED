@@ -3,13 +3,12 @@ GED Graphic Edit Distance - 2020算分课程团队项目
 项目运行环境：Python 3.x &nbsp; &nbsp; NumPy 最好1.14.1及以上
 
 ## 数据
-来源于比赛官网 [ICPR 2016](https://gdc2016.greyc.fr/)。  
-已将 .gxl 格式文件转换为 .json 和 .txt 类型。转换后数据存放在文件夹 data 中。  
-详细的数据说明请见该目录下 README.md 文件。
+&emsp;&emsp;来源于比赛官网 [ICPR 2016](https://gdc2016.greyc.fr/)。  
+&emsp;&emsp;已将 .gxl 格式文件转换为 .json 和 .txt 类型。转换后数据存放在文件夹 data 中。详细的数据说明请见该目录下 README.md 文件。
 
 ## 损失函数
-我们考虑的损失函数的范围与 [ICPR 2016](https://gdc2016.greyc.fr/) 的 Alkane 和 MUTA 数据集相同。  
-我们将针对这种**代价不受不同标签相似度影响**的损失函数在程序中使用特定的优化。
+* 我们考虑的损失函数的范围与 [ICPR 2016](https://gdc2016.greyc.fr/) 的 Alkane 和 MUTA 数据集相同。  
+* 我们将针对这种**代价不受不同标签相似度影响**的损失函数在程序中使用特定的优化。
 
 ## 代码组织逻辑
 &emsp;&emsp;本次项目中我们进行了诸多连贯的尝试，因此出现了大量的代码复用现象。为了使代码的逻辑层次更清楚，以免自己陷入无意义的重复之中，我们对文件进行模块化处理。  
