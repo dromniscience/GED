@@ -3,7 +3,7 @@
 """
 lasp.py: LSAP Solver
 
-    Currently This file contains an Munkres' Hungarian implementation.
+    Currently this file contains a Munkres' Hungarian implementation.
 
 Written by Ding Rui
 Latest Version: 2020/5/25
