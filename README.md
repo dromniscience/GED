@@ -40,5 +40,5 @@ GED Graphic Edit Distance - 2020算分课程团队项目
 * 最短增广路径
 * 线性规划
 
-&emsp;&emsp;尽管原始-对偶规划 (primal-dual algorithm) 常常在实践中表现出最明显的优势，但我们仍然很时有兴趣回到这个问题最初被有效解决的情况。那是得益于 Konig 提供的有趣命题，即“有限简单二部图的最大匹配数恰好等于最小点覆盖数”，所提出的解法。尽管它有着 O(n<sup>4</sup>) 的复杂度，但本身这个算法的设计却非常有趣，还很有娱乐性。它是被 J. Munkres 严谨地描述并证明的 _(Algorithms for the assignment and transportation problems, 1957)_ 。那时计算机并不普及，算法的实现常常是手动模拟，因此生动的描述是它能够广泛传播的重要优势。例如原来的算法就是用对零标星 (starred zero) 或者加撇 (primed zero) 讲述的。我们在这里完整地复现了这个有趣的设计。当然，写出来的代码也很美观。  
+&emsp;&emsp;尽管原始-对偶规划 (primal-dual algorithm) 常常在实践中表现出最明显的优势，但我们仍然很有兴趣回到这个问题最初被有效解决时的情况。那是得益于 Konig 提供的有趣命题，即“有限简单二部图的最大匹配数恰好等于最小点覆盖数”，所提出的解法。尽管它有着 O(n<sup>4</sup>) 的复杂度，但本身这个算法的设计却非常有趣，还很有娱乐性。它是被 J. Munkres 严谨地描述并证明的 _(Algorithms for the assignment and transportation problems, 1957)_ 。那时计算机并不普及，算法的实现常常是手动模拟，因此生动的描述是它能够广泛传播的重要优势。例如原来的算法就是用对零标星 (starred zero) 或者加撇 (primed zero) 讲述的。我们在这里完整地复现了这个有趣的设计。当然，写出来的代码也很美观。  
 &emsp;&emsp;代码在 lsap 模块中。当图的顶点不多时，我们会调用自己的 LSAP Solver；当然，它在性能上和 SciPy 的 \_lsap\_module 相比还有明显的差距。
