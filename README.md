@@ -23,7 +23,7 @@ GED Graphic Edit Distance - 2020算分课程团队项目
 使用 -h 查看详细说明。  
   
 示例：\>\> python BGM1.py -m 2 4 1 1 molecule_100.txt molecule_1000.txt  
-&emsp;&emsp;&emsp;\>\> python IFIP.py 2 4 1 2 molecule100.txt molecule010.txt
+&emsp;&emsp;&emsp;\>\> python IPFP1.py 2 4 1 2 molecule100.txt molecule010.txt
 
 ## A*-algorithm
     基于 A* 算法的精确 GED 程序，实现在 AStar.py 中. 
