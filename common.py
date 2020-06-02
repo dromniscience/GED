@@ -16,7 +16,8 @@ common.py: includes the definition of reusable codes, namely:
              Otherwise it may produce incorrect answer for GED.
 
 Written by Ding Rui
-Latest Version: 2020/5/24
+Version 1.0: 2020/5/24
+Version 1.1: 2020/6/2   Speed up the formulation of the quadratic matrix
 '''
 
 # from Common import * 时仅允许导入以下变量
@@ -203,27 +204,32 @@ def SolveLSAP(cost_matrix: np.ndarray):
 
 # 构造线性变换的和二次型的矩阵 cost, delta
 def DeltaMatrix(graph1: Graph, graph2: Graph):
-    # 线性变换的矩阵
+    # 压缩的线性变换的矩阵
     cost = CostMatrix(graph1, graph2, lambda x, y, z, w: 0)
     # 二次型的矩阵
     tot = graph1.dots + graph2.dots
     delta = np.zeros((tot**2, tot**2))
-    for i in range(tot ** 2):
-        for j in range(tot ** 2): # dot1 -> dot1_map; dot2 -> dot2_map
-            dot1, dot1_map = i // tot, i % tot
-            dot2, dot2_map = j // tot, j % tot
-            # 不合法的点对应
-            if int(cost[dot1, dot1_map]) == inf or int(cost[dot2, dot2_map]) == inf:
-                delta[i,j] = inf
-            # 对角线上取零
-            elif dot1 == dot2 and dot1_map == dot2_map:
-                delta[i,j] = 0
-            # 根据对应边的存在性决定边编辑的代价
-            elif (dot1, dot2) in graph1.etag:
-                if (dot1_map, dot2_map) in graph2.etag:
-                    delta[i,j] = (edge_sub if graph1.etag[(dot1, dot2)] != graph2.etag[(dot1_map, dot2_map)] else 0)
-                else:
-                    delta[i,j] = edge_del
-            else:
-                delta[i,j] = (edge_ins if (dot1_map, dot2_map) in graph2.etag else 0)
+    # 填充
+    for dot1, dot2 in graph1.etag:
+        delta[dot1*tot:(dot1+1)*tot,dot2*tot:(dot2+1)*tot] = edge_del
+    for dot1, dot2 in graph2.etag:
+        delta[dot1::tot,dot2::tot] = edge_ins
+    for (dot1, dot2), tag1 in graph1.etag.items():
+        for (dot1_map, dot2_map), tag2 in graph2.etag.items():
+            delta[dot1*tot+dot1_map, dot2*tot+dot2_map] = (edge_sub if tag1 != tag2 else 0)
+    for i in range(tot):
+        delta[np.diag_indices(tot**2)] = 0
+    # 优先级最高, 故最后填充
+    for i in range(graph1.dots):
+        for j in range(graph1.dots):
+            if i == j:
+                continue
+            delta[i*tot+j+graph2.dots,:] = inf
+            delta[:,i*tot+j+graph2.dots] = inf
+    for i in range(graph2.dots):
+        for j in range(graph2.dots):
+            if i == j:
+                continue
+            delta[(i+graph1.dots)*tot+j,:] = inf
+            delta[:,(i+graph1.dots)*tot+j] = inf
     return cost, delta
