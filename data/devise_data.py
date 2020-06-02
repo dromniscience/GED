@@ -1,13 +1,15 @@
 """
-devise_data.py: make devise data for testing
-
-using class Graph in common.py
+devise_data.py: Devise data for testing
+    
+    Create new data based on the following property:
+        We assume c_{dot, sub} \leq c_{dot,ins} + c_{dot,del}.
+        Given a graph g1, if we first randomly delete some of the nodes and edges,
+        and then substitute some labels to ones that are not originally presented,
+        then GED(g1,g2) is the very cost of this formulation.
 
 Written by Jiang Heng
-Last Version: 2020/5/29
-
+Latest Version: 2020/5/29
 """
-
 
 import numpy as np
 import random
